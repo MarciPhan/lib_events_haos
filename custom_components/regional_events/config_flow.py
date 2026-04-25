@@ -5,9 +5,7 @@ from typing import Any
 import voluptuous as vol
 
 from homeassistant import config_entries
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResult
-import homeassistant.helpers.config_validation as cv
+from homeassistant.core import HomeAssistant, callback
 
 from .const import DOMAIN, CONF_CITIES, CITY_LIBEREC, CITY_JABLONEC
 from .options_flow import OptionsFlow
@@ -27,7 +25,12 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a config flow for Regional Events."""
 
     VERSION = 1
-    options_flow_handler = OptionsFlow
+
+    @staticmethod
+    @callback
+    def async_get_options_flow(config_entry: config_entries.ConfigEntry) -> OptionsFlow:
+        """Get the options flow for this handler."""
+        return OptionsFlow(config_entry)
 
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
@@ -45,9 +48,10 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             title="Kulturní radar",
             data=user_input,
             options={
-                "preferred_categories": [],
+                "interests": [],
                 "blocked_categories": [],
+                "preferred_venues": "Linserka, Lipo.ink",
+                "max_distance": 25,
                 "enable_notifications": True,
-                "prefer_free_events": False,
             }
         )
