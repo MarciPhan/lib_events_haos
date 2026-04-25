@@ -6,6 +6,8 @@ import voluptuous as vol
 
 from homeassistant import config_entries
 from homeassistant.core import HomeAssistant, callback
+from homeassistant.data_entry_flow import FlowResult
+import homeassistant.helpers.config_validation as cv
 
 from .const import DOMAIN, CONF_CITIES, CITY_LIBEREC, CITY_JABLONEC
 from .options_flow import OptionsFlow
