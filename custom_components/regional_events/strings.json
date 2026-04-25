@@ -1,0 +1,30 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Kulturní radar",
+        "description": "Vyberte města, pro která chcete sledovat akce a doporučení.",
+        "data": {
+          "cities": "Miasta"
+        }
+      }
+    },
+    "abort": {
+      "already_configured": "Kulturní radar je již nakonfigurován."
+    }
+  },
+  "options": {
+    "step": {
+      "preferences": {
+        "title": "Preference Kulturního radaru",
+        "description": "Nastavte vaše preference pro doporučení akcí.",
+        "data": {
+          "preferred_categories": "Oblíbené kategorie",
+          "blocked_categories": "Blokované kategorie",
+          "enable_notifications": "Povolit notifikace",
+          "prefer_free_events": "Upřednostňovat zdarma akce"
+        }
+      }
+    }
+  }
+}

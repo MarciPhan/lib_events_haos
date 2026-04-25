@@ -1,0 +1,64 @@
+refresh_events:
+  name: Aktualizuj akce
+  description: Vynutí okamžitou aktualizaci akcí
+
+mark_event_interested:
+  name: Označ akci jako zajímavou
+  description: Přidej akci do seznamu zajímavých
+  fields:
+    event_id:
+      name: ID akce
+      description: UID akce z kalendáře
+      selector:
+        text:
+
+ignore_event:
+  name: Ignoruj akci
+  description: Skryj akci z doporučení
+  fields:
+    event_id:
+      name: ID akce
+      description: UID akce z kalendáře
+      selector:
+        text:
+
+ignore_venue:
+  name: Ignoruj místo
+  description: Přidej místo na blacklist
+  fields:
+    venue_name:
+      name: Jméno místa
+      description: Název místa k ignorování
+      selector:
+        text:
+
+generate_digest:
+  name: Generuj digest
+  description: Vytvoří digest akcí pro zadané období
+  fields:
+    period:
+      name: Období
+      description: Jaké období akcí
+      selector:
+        select:
+          options:
+            - today
+            - tomorrow
+            - weekend
+            - week
+    max_events:
+      name: Maximální počet
+      description: Kolik akcí vrátit
+      default: 5
+      selector:
+        number:
+          min: 1
+          max: 20
+    min_score:
+      name: Minimální skóre
+      description: Minimální skóre doporučeného
+      default: 60
+      selector:
+        number:
+          min: 0
+          max: 100

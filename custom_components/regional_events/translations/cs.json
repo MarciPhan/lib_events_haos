@@ -1,0 +1,34 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Regionální akce",
+        "description": "Vyberte města, pro která chcete sledovat akce.",
+        "data": {
+          "cities": "Města"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Nepodařilo se připojit k webu.",
+      "unknown": "Neočekávaná chyba."
+    },
+    "abort": {
+      "already_configured": "Tato integrace je již nastavena."
+    }
+  },
+  "options": {
+    "step": {
+      "preferences": {
+        "title": "Předvolby radaru",
+        "data": {
+          "interests": "Zájmy a kategorie",
+          "blocked_categories": "Blokované kategorie",
+          "preferred_venues": "Oblíbená místa (oddělená čárkou)",
+          "max_distance": "Maximální vzdálenost (km)",
+          "enable_notifications": "Povolit chytré notifikace"
+        }
+      }
+    }
+  }
+}

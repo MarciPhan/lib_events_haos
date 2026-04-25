@@ -1,0 +1,15 @@
+{
+  "domain": "regional_events",
+  "name": "Kulturní radar",
+  "codeowners": ["@user"],
+  "config_flow": true,
+  "documentation": "https://github.com/user/hacs-regional-events",
+  "issue_tracker": "https://github.com/user/hacs-regional-events/issues",
+  "requirements": ["feedparser==6.0.10", "beautifulsoup4==4.12.3"],
+  "version": "0.2.0",
+  "iot_class": "cloud_polling",
+  "platforms": [
+    "calendar",
+    "sensor"
+  ]
+}
