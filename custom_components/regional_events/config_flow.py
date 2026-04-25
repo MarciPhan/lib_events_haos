@@ -10,7 +10,6 @@ from homeassistant.data_entry_flow import FlowResult
 import homeassistant.helpers.config_validation as cv
 
 from .const import DOMAIN, CONF_CITIES, CITY_LIBEREC, CITY_JABLONEC
-from .options_flow import OptionsFlow
 
 STEP_USER_DATA_SCHEMA = vol.Schema(
     {
@@ -56,4 +55,65 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 "max_distance": 25,
                 "enable_notifications": True,
             }
+        )
+
+class OptionsFlow(config_entries.OptionsFlow):
+    """Handle options flow for Regional Events."""
+
+    async def async_step_init(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+        """Handle the initial step."""
+        return await self.async_step_preferences()
+
+    async def async_step_preferences(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+        """Handle preferences step."""
+        if user_input is not None:
+            return self.async_create_entry(title="", data=user_input)
+
+        return self.async_show_form(
+            step_id="preferences",
+            data_schema=vol.Schema({
+                vol.Optional(
+                    "interests",
+                    default=self.config_entry.options.get("interests", [])
+                ): cv.multi_select({
+                    "music": "🎵 Hudba",
+                    "theatre": "🎭 Divadlo",
+                    "cinema": "🎬 Kino",
+                    "exhibition": "🖼️ Výstava",
+                    "education": "📚 Vzdělání",
+                    "kids": "👶 Děti",
+                    "sports": "⚽ Sport",
+                    "business": "💼 Podnikání",
+                    "market": "🛍️ Trhy",
+                    "food": "🍽️ Gastronomie",
+                    "technologie": "💻 Technologie",
+                }),
+                vol.Optional(
+                    "blocked_categories",
+                    default=self.config_entry.options.get("blocked_categories", [])
+                ): cv.multi_select({
+                    "music": "🎵 Hudba",
+                    "theatre": "🎭 Divadlo",
+                    "cinema": "🎬 Kino",
+                    "exhibition": "🖼️ Výstava",
+                    "education": "📚 Vzdělání",
+                    "kids": "👶 Děti",
+                    "sports": "⚽ Sport",
+                    "business": "💼 Podnikání",
+                    "market": "🛍️ Trhy",
+                    "food": "🍽️ Gastronomie",
+                }),
+                vol.Optional(
+                    "preferred_venues",
+                    default=self.config_entry.options.get("preferred_venues", "Linserka, Lipo.ink")
+                ): cv.string,
+                vol.Optional(
+                    "max_distance",
+                    default=self.config_entry.options.get("max_distance", 25)
+                ): vol.All(vol.Coerce(int), vol.Range(min=1, max=100)),
+                vol.Optional(
+                    "enable_notifications",
+                    default=self.config_entry.options.get("enable_notifications", True)
+                ): cv.boolean,
+            }),
         )
