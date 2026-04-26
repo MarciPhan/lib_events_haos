@@ -8,6 +8,7 @@ from .const import DOMAIN, LOGGER
 
 SERVICE_REFRESH = "refresh_events"
 SERVICE_GENERATE_DIGEST = "generate_digest"
+SERVICE_SEND_NOTIFICATION = "send_notification"
 
 DIGEST_SCHEMA = vol.Schema({
     vol.Optional("period", default="weekend"): vol.In(["today", "tomorrow", "weekend", "week"]),
@@ -15,6 +16,12 @@ DIGEST_SCHEMA = vol.Schema({
     vol.Optional("min_score", default=60): vol.Coerce(float),
     vol.Optional("use_ai", default=False): vol.Coerce(bool),
     vol.Optional("ai_agent", default="conversation.home"): cv.string,
+})
+
+NOTIFICATION_SCHEMA = vol.Schema({
+    vol.Required("target"): cv.string,
+    vol.Optional("period", default="weekend"): vol.In(["today", "tomorrow", "weekend", "week"]),
+    vol.Optional("min_score", default=70): vol.Coerce(float),
 })
 
 async def async_setup_services(hass: HomeAssistant) -> None:
@@ -75,7 +82,9 @@ async def async_setup_services(hass: HomeAssistant) -> None:
                     blocking=True,
                     return_response=True
                 )
-                text = ai_result.get("response", {}).get("speech", {}).get("plain", {}).get("speech", "Chyba AI.")
+                # Check different response formats
+                resp_data = ai_result.get("response", {})
+                text = resp_data.get("speech", {}).get("plain", {}).get("speech", "Chyba AI.")
             except Exception as e:
                 LOGGER.error("AI Digest error: %s", e)
                 text = "Nepodařilo se vygenerovat AI souhrn."
@@ -87,8 +96,37 @@ async def async_setup_services(hass: HomeAssistant) -> None:
                 if event.reasoning: text += f"   💡 {event.reasoning[0]}\n"
                 text += "\n"
         
-        hass.bus.async_fire(f"{DOMAIN}_digest_generated", {"text": text})
+        hass.bus.async_fire(f"{DOMAIN}_digest_generated", {"text": text, "period": period})
         hass.states.async_set(f"sensor.{DOMAIN}_digest", text, {"period": period})
+
+    async def handle_send_notification(call: ServiceCall) -> None:
+        """Handle notification service call."""
+        target = call.data.get("target")
+        period = call.data.get("period")
+        min_score = call.data.get("min_score")
+        
+        # We can reuse digest logic or just trigger it
+        # For simplicity, let's just use the state of the digest sensor if available
+        # or generate a fresh one.
+        
+        # Trigger digest generation first (without AI for speed/cost unless requested)
+        await handle_generate_digest(ServiceCall(DOMAIN, SERVICE_GENERATE_DIGEST, {
+            "period": period,
+            "min_score": min_score,
+            "max_events": 3
+        }))
+        
+        digest_text = hass.states.get(f"sensor.{DOMAIN}_digest").state
+        
+        await hass.services.async_call(
+            "notify",
+            target,
+            {
+                "title": f"Radar: Tipy na {period}",
+                "message": digest_text
+            }
+        )
 
     hass.services.async_register(DOMAIN, SERVICE_REFRESH, handle_refresh)
     hass.services.async_register(DOMAIN, SERVICE_GENERATE_DIGEST, handle_generate_digest, schema=DIGEST_SCHEMA)
+    hass.services.async_register(DOMAIN, SERVICE_SEND_NOTIFICATION, handle_send_notification, schema=NOTIFICATION_SCHEMA)

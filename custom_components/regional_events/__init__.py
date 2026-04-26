@@ -34,6 +34,22 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     static_path = os.path.join(os.path.dirname(__file__), "frontend")
     hass.http.register_static_path("/regional_events_static", static_path)
 
+    # Register Sidebar Panel
+    if "frontend" in hass.config.components:
+        hass.components.frontend.async_register_panel(
+            component_name="custom",
+            sidebar_title="Kulturní radar",
+            sidebar_icon="mdi:radar",
+            main_url="/regional_events_static/panel.js",
+            panel_icon="mdi:radar",
+            url_path="kulturni-radar",
+            config={
+                "entry_id": entry.entry_id,
+                "title": "Kulturní radar Liberec & Jablonec"
+            },
+            require_admin=False
+        )
+
     return True
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:

@@ -108,7 +108,10 @@ class RegionalEventsCoordinator(DataUpdateCoordinator):
                 data[city] = []
             data[city].append(event.to_calendar_dict())
         
-        # Store all events flat for sensors
+        # Store all events flat for sensors and frontend
         self.all_events = all_events
         
-        return data
+        return {
+            "cities": data,
+            "all_events": [e.to_calendar_dict() for e in all_events]
+        }

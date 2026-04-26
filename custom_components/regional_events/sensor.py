@@ -113,12 +113,17 @@ class NextEventSensor(CoordinatorEntity[RegionalEventsCoordinator], SensorEntity
         events = self.coordinator.all_events
         now = datetime.now()
         upcoming = [e for e in events if (e.start if isinstance(e.start, datetime) else datetime.combine(e.start, datetime.min.time())) >= now]
-        if not upcoming: return {}
+        
+        attrs = {
+            "all_events": self.coordinator.data.get("all_events", [])
+        }
+        
+        if not upcoming: return attrs
         
         upcoming.sort(key=lambda e: e.start)
         event = upcoming[0]
         
-        return {
+        attrs.update({
             "start": event.start.isoformat() if hasattr(event.start, 'isoformat') else str(event.start),
             "location": event.location,
             "category": event.category,
@@ -130,7 +135,8 @@ class NextEventSensor(CoordinatorEntity[RegionalEventsCoordinator], SensorEntity
             "price": event.price,
             "url": event.url,
             "reasoning": event.reasoning,
-        }
+        })
+        return attrs
 
 
 class RecommendedEventSensor(CoordinatorEntity[RegionalEventsCoordinator], SensorEntity):

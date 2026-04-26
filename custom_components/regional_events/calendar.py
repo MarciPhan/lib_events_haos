@@ -1,7 +1,7 @@
 """Support for Regional Events calendar."""
 from __future__ import annotations
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 
 from homeassistant.components.calendar import CalendarEntity, CalendarEvent
 from homeassistant.config_entries import ConfigEntry
@@ -47,14 +47,14 @@ class RegionalCalendarEntity(CoordinatorEntity[RegionalEventsCoordinator], Calen
     @property
     def event(self) -> CalendarEvent | None:
         """Return the next upcoming event."""
-        events = self.coordinator.data.get(self._city, [])
+        events = self.coordinator.data.get("cities", {}).get(self._city, [])
         if not events:
             return None
         
         # Sort by start date and filter past events
         now = datetime.now().date()
-        upcoming = [e for e in events if isinstance(e["start"], datetime) and e["start"].date() >= now or isinstance(e["start"], date) and e["start"] >= now]
-        upcoming.sort(key=lambda x: x["start"] if isinstance(x["start"], date) else x["start"].date())
+        upcoming = [e for e in events if (isinstance(e["start"], datetime) and e["start"].date() >= now) or (isinstance(e["start"], date) and not isinstance(e["start"], datetime) and e["start"] >= now)]
+        upcoming.sort(key=lambda x: x["start"] if isinstance(x["start"], date) and not isinstance(x["start"], datetime) else x["start"].date())
         
         if not upcoming:
             return None
@@ -87,7 +87,7 @@ class RegionalCalendarEntity(CoordinatorEntity[RegionalEventsCoordinator], Calen
         end_date: datetime,
     ) -> list[CalendarEvent]:
         """Return calendar events within a datetime range."""
-        events = self.coordinator.data.get(self._city, [])
+        events = self.coordinator.data.get("cities", {}).get(self._city, [])
         if not events:
             return []
         
